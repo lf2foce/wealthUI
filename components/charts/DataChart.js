@@ -19,6 +19,8 @@ import Plot from 'react-plotly.js';
 const DataChart = (props) => {
 
     const res = props.df_api
+
+    
     // var plot1 = {
     //     x: res['date'],
     //     y:  res['FPT'],
@@ -82,8 +84,7 @@ const DataChart = (props) => {
 
             }
     
-    
-    // var data = [plot1, plot2];
+        // var data = [plot1, plot2];
         return(
             <Plot
             data={data}

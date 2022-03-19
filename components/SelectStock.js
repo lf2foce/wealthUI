@@ -1,4 +1,6 @@
-import {Card, Button} from 'react-bootstrap';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+// import {Card, Button, Row, Container, Col} from 'react-bootstrap';
+
 import Select from 'react-select'
 
 import { useState } from 'react';
@@ -19,6 +21,10 @@ import dynamic from "next/dynamic";
 // })
 
 const DataChart = dynamic(() => import('../components/charts/DataChart'), {
+    ssr: false
+})
+
+const PieChart = dynamic(() => import('../components/charts/PieChart'), {
     ssr: false
 })
 
@@ -44,6 +50,8 @@ function SelectStock({ data, drawChart }) {
     const [toppings, setToppings] = useState([optionToppings[2], optionToppings[3]]);
     const [riskTypes, setRiskTypes] = useState(optionRiskTypes[0]);
     const [stockPrice, setStockPrice] = useState({});
+    const [weight, setWeight] = useState({'FPT':0.5, 'VIC':0.5});
+    const [metric, setMetric] = useState();
 
     function drawChart(){
         // setToppings(toppings);
@@ -60,13 +68,14 @@ function SelectStock({ data, drawChart }) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            // body: JSON.stringify(date_params),
             body: JSON.stringify({"tickers_input": ticker_str, "allocation_type": riskTypes.value } )
         })
         .then(response => response.json())
         .then(data => {
             console.log('submited:', data);
+            
             setStockPrice(data["df_json"]);
+            setWeight(data["weight"]);
            
             
             const desc = document.getElementById("cron descriptor");
@@ -79,23 +88,11 @@ function SelectStock({ data, drawChart }) {
       
     
     }
+    if (stockPrice) {
     return (
         <div>
             <div id="cron descriptor"></div>
-            <Card>
-
-            {/* <Card.Img variant="top" src="holder.js/100px180" /> */}
-            {/* <CoinPriceChart width={500} height={300} /> */}
-            {/* <MyChart /> */}
             
-            
-
-            <Card.Body>
-                <Card.Title>Dashboard</Card.Title>
-                <Card.Text>
-                chart here
-                
-                </Card.Text>
                 <Select
                     defaultValue={[optionToppings[2], optionToppings[3]]}
                     isMulti
@@ -114,14 +111,35 @@ function SelectStock({ data, drawChart }) {
                     classNamePrefix="select"
                 />
 
-                <Button variant="primary" onClick={() => drawChart()}>Get info</Button>
-            </Card.Body>
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"  onClick={() => drawChart()}>Get info</button>
+               
             {/* <PlotlyChart /> */}
-            <DataChart df_api={stockPrice} />
-            </Card>
+                
+            <div className="grid grid-cols-2 gap-4">
+                <div><h4>Annual volatility: {}</h4>
+                            <h4>Expected annual return: {2.7451139000718547}</h4>
+                            <h4>Sharpe Ratio: {7.630819321050874}</h4>
+                </div>
+                <div>  <DataChart df_api={stockPrice}  /></div>
+            </div>    
+               
+            <div><PieChart weigh_api={weight} /></div>
+                
+                
+           
+           
+            <br></br>
+                  
+                            
+                      
+                            
+                       
+                    
+               
 
             
         </div>
     );
+    } // end if
 }
 export default SelectStock;
